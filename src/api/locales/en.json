@@ -1,0 +1,14 @@
+{
+	"The full name field is require": "The full name field is require",
+	"Gender field is require": "Gender field is require",
+	"OTP field is require": "OTP field is require",
+	"Zip Code field is require": "Zip Code field is require",
+	"First Name field is require": "First Name field is require",
+	"Last Name field is require": "Last Name field is require",
+	"Phone Number field is require": "Phone Number field is require",
+	"Address field is require": "Address field is require",
+	"City field is require": "City field is require",
+	"State field is require": "State field is require",
+	"Country field is require": "Country field is require",
+	"Country Code field is require": "Country Code field is require"
+}
