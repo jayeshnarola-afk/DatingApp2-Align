@@ -6,11 +6,13 @@ import path from "path";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: env.DB_HOST,
-  port: 5432,
-  username: env.DB_USER,
-  password: env.DB_PASS,
-  database: env.DB_NAME,
+  url: "postgresql://datingapp2align_user:lujwhuUJzVaHP0k1WZu8JEj5FpVRRllE@dpg-d4iq0vngi27c739poe8g-a.oregon-postgres.render.com/datingapp2align",
+  synchronize: false,
+  // host: env.DB_HOST,
+  // port: 5432,
+  // username: env.DB_USER,
+  // password: env.DB_PASS,
+  // database: env.DB_NAME,
   logging: false,
   entities: [
     path.join(__dirname, "../", `domain/entities/*{.ts,.js}`),
@@ -23,7 +25,9 @@ export const AppDataSource = new DataSource({
 
   // IMPORTANT: No SSL for local PostgreSQL
   extra: {
-    ssl: false,
+    ssl: {
+      rejectUnauthorized: false,  // Render માટે જરૂરી
+    },
   },
 });
 

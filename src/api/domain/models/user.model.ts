@@ -465,15 +465,15 @@ export async function listsOfUsers(
     try {
         const { gender, search, looking_for, distance, location } = queryParameter;
 
-        console.log("filter parameter=====>",
-            "minage => ", minAge,
-            "maxAge => ", maxAge,
-            "gender => ", gender,
-            "search => ", search,
-            "looking_for =>", looking_for,
-            "distance =>", distance,
-            "location =>", location
-        )
+        // console.log("filter parameter=====>",
+        //     "minage => ", minAge,
+        //     "maxAge => ", maxAge,
+        //     "gender => ", gender,
+        //     "search => ", search,
+        //     "looking_for =>", looking_for,
+        //     "distance =>", distance,
+        //     "location =>", location
+        // )
         const userRepository = AppDataSource.getRepository(Users);
         const userInterestRepo = AppDataSource.getRepository(UserInterest);
         const skip = (page - 1) * limit;
@@ -783,15 +783,15 @@ export async function listsOfUsersForAdmin(
     try {
         const { gender, search, looking_for, distance, location } = queryParameter;
 
-        console.log("filter parameter=====>",
-            "minage => ", minAge,
-            "maxAge => ", maxAge,
-            "gender => ", gender,
-            "search => ", search,
-            "looking_for =>", looking_for,
-            "distance =>", distance,
-            "location =>", location
-        )
+        // console.log("filter parameter=====>",
+        //     "minage => ", minAge,
+        //     "maxAge => ", maxAge,
+        //     "gender => ", gender,
+        //     "search => ", search,
+        //     "looking_for =>", looking_for,
+        //     "distance =>", distance,
+        //     "location =>", location
+        // )
         const userRepository = AppDataSource.getRepository(Users);
         const userInterestRepo = AppDataSource.getRepository(UserInterest);
         const skip = (page - 1) * limit;
