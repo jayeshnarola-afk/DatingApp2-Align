@@ -6,7 +6,8 @@ import path from "path";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: "postgresql://datingapp2align_user:lujwhuUJzVaHP0k1WZu8JEj5FpVRRllE@dpg-d4iq0vngi27c739poe8g-a.oregon-postgres.render.com/datingapp2align",
+  // url: "postgresql://datingapp2align_user:lujwhuUJzVaHP0k1WZu8JEj5FpVRRllE@dpg-d4iq0vngi27c739poe8g-a.oregon-postgres.render.com/datingapp2align",
+  url: "postgresql://datingapp2align_user:V5verhcsYqjMlQRsOU9imoVLrxcDKVih@dpg-d5tet6a4d50c73c4m7p0-a.oregon-postgres.render.com/datingapp2align_p5dm", 
   synchronize: false,
   // host: env.DB_HOST,
   // port: 5432,

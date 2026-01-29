@@ -8,7 +8,8 @@
     "test": "jest",
     "rebuild": "npm run build",
     "pm2": "pm2 restart build/index.js",
-    "start:dev": "ts-node-dev --respawn --transpile-only index.ts"
+    "start:dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "migration:run": "ts-node run-blog-migration.ts"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",

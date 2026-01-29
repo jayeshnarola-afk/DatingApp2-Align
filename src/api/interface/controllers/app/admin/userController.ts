@@ -35,23 +35,23 @@ import { addReportedContent, reportedContentLists } from "../../../../domain/mod
 export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
   console.log("calling this..........")
   const reqBody = req.body;
-  if(!reqBody.mobile){
-    return ErrorResponse(res,"Mobile number is required.");
+  if (!reqBody.mobile) {
+    return ErrorResponse(res, "Mobile number is required.");
   }
 
-  const query:any = {}
-  if(req.body.mobile) query.mobile = reqBody.mobile;
+  const query: any = {}
+  if (req.body.mobile) query.mobile = reqBody.mobile;
 
   try {
-    verifyOtpApi(query,reqBody,(error:any, result:any) => {
-      if(error){
+    verifyOtpApi(query, reqBody, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error);
       }
-      return successResponse(res,"Verify otp successfully.",result);
-    })  
+      return successResponse(res, "Verify otp successfully.", result);
+    })
   } catch (error) {
-    if(error instanceof Error){
-      return ErrorResponse(res,error.message)
+    if (error instanceof Error) {
+      return ErrorResponse(res, error.message)
     }
   }
 }
@@ -65,7 +65,7 @@ export const createAccount = async (req: Request, res: Response): Promise<any> =
     // await userSignUpValidation.validateAsync(body);
 
     // If validation passes, proceed with user signup
-    createAccountApi(body,files,userId, (error: any, result: any) => {
+    createAccountApi(body, files, userId, (error: any, result: any) => {
       if (error) {
         console.log("Signup error:", error);
         return ErrorResponse(res, error);
@@ -80,10 +80,10 @@ export const createAccount = async (req: Request, res: Response): Promise<any> =
   }
 };
 
-export const Login = async(req: Request, res: Response): Promise<any> => {
+export const Login = async (req: Request, res: Response): Promise<any> => {
   try {
     await userSingInValidation.validateAsync(req.body)
-   
+
     userSignIn(req.body, async (err: any, data: any) => {
       if (err) {
         return ErrorResponse(res, err);
@@ -102,7 +102,7 @@ export const Login = async(req: Request, res: Response): Promise<any> => {
   }
 };
 
-export const usersLists = async(req: Request, res: Response): Promise<any> => {
+export const usersLists = async (req: Request, res: Response): Promise<any> => {
   try {
     let page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 10;
@@ -111,14 +111,33 @@ export const usersLists = async(req: Request, res: Response): Promise<any> => {
     const maxAge = Number(req.query.maxAge)
     const userId = req.user.userId
 
-    listsOfUsers(userId,page, limit,queryParameter,minAge, maxAge,(error:any, result:any) => {
-      if(error){
-        return ErrorResponse(res, error)
+    // Parse interest_ids from query (can be comma-separated string or array)
+    let filterInterestIds: number[] = [];
+    if (req.query.interest_ids) {
+      if (typeof req.query.interest_ids === 'string') {
+        filterInterestIds = req.query.interest_ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      } else if (Array.isArray(req.query.interest_ids)) {
+        filterInterestIds = req.query.interest_ids.map(id => parseInt(String(id))).filter(id => !isNaN(id));
       }
-      return successResponse(res, "Users Lists.", result)
-    })
+    }
+
+    listsOfUsers(
+      userId,
+      page,
+      limit,
+      queryParameter,
+      minAge,
+      maxAge,
+      filterInterestIds,
+      (error: any, result: any) => {
+        if (error) {
+          return ErrorResponse(res, error);
+        }
+        return successResponse(res, "Users Lists.", result);
+      }
+    )
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       logger.error(JSON.stringify(error));
       return ErrorResponse(res, error.message)
     }
@@ -126,39 +145,39 @@ export const usersLists = async(req: Request, res: Response): Promise<any> => {
 }
 
 
-export const getUserDetails = async(req: Request, res:Response): Promise<any> => {
+export const getUserDetails = async (req: Request, res: Response): Promise<any> => {
   const userId = Number(req.params.userId);
   const loggedInUserId = req.user.userId;
 
   try {
-    getDetailsOfCurrentUser(userId,loggedInUserId,(error:any, result:any) => {
-      if(error){
-        return ErrorResponse(res,error)
+    getDetailsOfCurrentUser(userId, loggedInUserId, (error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
       }
-      return successResponse(res,"Current user details.", result)
+      return successResponse(res, "Current user details.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       logger.error(JSON.stringify(error));
       return ErrorResponse(res, error.message)
     }
   }
 }
 
-export const updateUserDetails = async (req:Request, res:Response) :Promise<any> => {
-  const {userId} = req.user;
+export const updateUserDetails = async (req: Request, res: Response): Promise<any> => {
+  const { userId } = req.user;
   const body = req.body;
 
   try {
-    updateDetailsOfCurrentUser(userId, body, req.files,(error:any, result:any) => {
-      if(error){
+    updateDetailsOfCurrentUser(userId, body, req.files, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res,"Details update successfully.",result)
+      return successResponse(res, "Details update successfully.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
-      console.log("+++++++error======>",error)
+    if (error instanceof Error) {
+      console.log("+++++++error======>", error)
       logger.error(JSON.stringify(error))
       return ErrorResponse(res, error.message)
     }
@@ -166,70 +185,70 @@ export const updateUserDetails = async (req:Request, res:Response) :Promise<any>
 }
 
 
-export const uploadMedia = async(req: Request, res: Response)=>{
+export const uploadMedia = async (req: Request, res: Response) => {
   const files = req.files;
   const userId = "general" as string
   try {
-    uploadMediaOnFirebase(files,userId,(error:any, result:any) => {
-      if(error){
+    uploadMediaOnFirebase(files, userId, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res, "Upload successfully.",result)
+      return successResponse(res, "Upload successfully.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       logger.error(JSON.stringify(error))
       return ErrorResponse(res, error.message)
     }
   }
 }
 
-export const updateStatus = async(req: Request, res: Response) => {
+export const updateStatus = async (req: Request, res: Response) => {
   const reqBody = req.body;
   try {
-    updateUserStatus(reqBody,(error:any, result:any) => {
-      if(error){
+    updateUserStatus(reqBody, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res,"Status changed successfully.",result)
+      return successResponse(res, "Status changed successfully.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
-      return ErrorResponse(res,error)
+    if (error instanceof Error) {
+      return ErrorResponse(res, error)
     }
   }
 }
 
 
-export const blockUser = async(req: Request, res: Response) => {
-      const blocker_id = req.user.userId;
-      const blocked_id = parseInt(req.params.id);
-     
-      try {
-        blockedUserByAdmin(blocker_id,blocked_id,(error:any, result:any) => {
-              if(error){
-                  return ErrorResponse(res, error)
-              }
-              return successCreated(res, result)
-          })
-      } catch (error) {
-          if(error instanceof Error){
-              return ErrorResponse(res,error.message)
-          }
+export const blockUser = async (req: Request, res: Response) => {
+  const blocker_id = req.user.userId;
+  const blocked_id = parseInt(req.params.id);
+
+  try {
+    blockedUserByAdmin(blocker_id, blocked_id, (error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
       }
+      return successCreated(res, result)
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      return ErrorResponse(res, error.message)
+    }
+  }
 }
 
 export const isExistUser = async (req: Request, res: Response): Promise<any> => {
   try {
-    const {email, mobile} = req.body;
-    if(!email && !mobile){
-      return ErrorResponse(res,"Either email or phone must be provided.")
+    const { email, mobile } = req.body;
+    if (!email && !mobile) {
+      return ErrorResponse(res, "Either email or phone must be provided.")
     }
-    checkExistingUser(email,mobile,(error:any, result:any) => {
-      if(error){
-        return ErrorResponse(res,error)
+    checkExistingUser(email, mobile, (error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
       }
-      return successResponse(res,"Check user exist.",result)
+      return successResponse(res, "Check user exist.", result)
     })
   } catch (error) {
     if (error instanceof Error) {
@@ -238,35 +257,35 @@ export const isExistUser = async (req: Request, res: Response): Promise<any> => 
   }
 }
 
-export const changeEmail = async(req: Request, res: Response): Promise<any> => {
+export const changeEmail = async (req: Request, res: Response): Promise<any> => {
   const userId = req.user.userId;
   const email = req.body.email;
   try {
-    requestToChangeEmail(userId, email,(error:any, result:any) => {
-      if(error){
+    requestToChangeEmail(userId, email, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successCreated(res, result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
 }
-export const verifyEmail = async(req: Request, res: Response): Promise<any> => {
+export const verifyEmail = async (req: Request, res: Response): Promise<any> => {
   const userId = req.user.userId;
   const email = req.body.email;
   const otp = req.body.otp;
   try {
-    verifyToChangeEmail(userId,otp, email,(error:any, result:any) => {
-      if(error){
+    verifyToChangeEmail(userId, otp, email, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res,"Verify email successfully." ,result)
+      return successResponse(res, "Verify email successfully.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -275,38 +294,38 @@ export const verifyEmail = async(req: Request, res: Response): Promise<any> => {
 export const deleteAccount = async (req: Request, res: Response) => {
   const userId = req.user.userId;
   try {
-    deleteUserAccount(userId,(error:any,result:any) => {
-      if(error){
-        return ErrorResponse(res,error)
+    deleteUserAccount(userId, (error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
       }
       return successCreated(res, result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
 }
 
-export const cafe = async(req: Request, res: Response) => {
+export const cafe = async (req: Request, res: Response) => {
   const userId = req.user.userId;
   const matchUserId = Number(req.query.match_user_id);
-    let page = parseInt(req.query.page as string) || 1;
-    let limit = parseInt(req.query.limit as string) || 10;
-    const searchText = String(req.query.search) || ""
+  let page = parseInt(req.query.page as string) || 1;
+  let limit = parseInt(req.query.limit as string) || 10;
+  const searchText = String(req.query.search) || ""
   try {
-    cafeLists(userId,matchUserId,page,limit,searchText,(error:any,is_over_range:boolean=false, result: any) => {
-      if(error){
+    cafeLists(userId, matchUserId, page, limit, searchText, (error: any, is_over_range: boolean = false, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      
-      if(is_over_range){
+
+      if (is_over_range) {
         return successCreated(res, result)
       }
-      return successResponse(res,"Cafe lists.", result)
+      return successResponse(res, "Cafe lists.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -315,37 +334,37 @@ export const cafe = async(req: Request, res: Response) => {
 export const newRefreshToken = (req: Request, res: Response) => {
   const userId = req.user.userId;
   try {
-    userNewRefreshToken(userId,(error:any, result:any) => {
-      if(error){
+    userNewRefreshToken(userId, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res, "Refresh tokens.",result)
+      return successResponse(res, "Refresh tokens.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
 }
 
 
-export const adminLogin = async(req: Request, res: Response) => {
+export const adminLogin = async (req: Request, res: Response) => {
   try {
     const reqBody = req.body
-    adminLoginApi(reqBody,(error:any, result:any) => {
-      if(error){
+    adminLoginApi(reqBody, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res, "Admin login successfully.",result)
+      return successResponse(res, "Admin login successfully.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
 }
 
-export const usersListsForAdmin = async(req: Request, res: Response): Promise<any> => {
+export const usersListsForAdmin = async (req: Request, res: Response): Promise<any> => {
   try {
     let page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 10;
@@ -354,14 +373,14 @@ export const usersListsForAdmin = async(req: Request, res: Response): Promise<an
     const maxAge = Number(req.query.maxAge)
     const userId = req.user.userId
 
-    listsOfUsersForAdmin(userId,page, limit,queryParameter,minAge, maxAge,(error:any, result:any) => {
-      if(error){
+    listsOfUsersForAdmin(userId, page, limit, queryParameter, minAge, maxAge, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successResponse(res, "Users Lists.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       logger.error(JSON.stringify(error));
       return ErrorResponse(res, error.message)
     }
@@ -369,31 +388,31 @@ export const usersListsForAdmin = async(req: Request, res: Response): Promise<an
 }
 
 export const reportedUsers = async (req: Request, res: Response) => {
-    try {
-        listsReportedUsers((error:any, result:any) => {
-            if(error){
-                return ErrorResponse(res, error)
-            }
-            return successResponse(res,"Reported users lists.",result)
-        })
-    } catch (error) {
-        if(error instanceof Error){
-            return ErrorResponse(res, error.message)
-        }
-    }
-}
-
-export const blockUsersLists = async(req: Request, res: Response) => {
   try {
-    blockedUserListByAdmin((error:any, result:any) => {
-      if(error){
+    listsReportedUsers((error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
-      return successResponse(res, "Bloked users lists.",result)
+      return successResponse(res, "Reported users lists.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
-      return ErrorResponse(res,error.message)
+    if (error instanceof Error) {
+      return ErrorResponse(res, error.message)
+    }
+  }
+}
+
+export const blockUsersLists = async (req: Request, res: Response) => {
+  try {
+    blockedUserListByAdmin((error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
+      }
+      return successResponse(res, "Bloked users lists.", result)
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      return ErrorResponse(res, error.message)
     }
   }
 }
@@ -402,14 +421,14 @@ export const reportOnContent = async (req: Request, res: Response) => {
   const reporterId = req.user.userId;
   const reqBody = req.body;
   try {
-    addReportedContent(reporterId, reqBody,(error:any, result:any) => {
-      if(error){
+    addReportedContent(reporterId, reqBody, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successCreated(res, result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -419,14 +438,14 @@ export const reportOnContent = async (req: Request, res: Response) => {
 export const reportContents = async (req: Request, res: Response) => {
   const reqQuery = req.query;
   try {
-    reportedContentLists(reqQuery,(error:any, result:any) => {
-      if(error){
+    reportedContentLists(reqQuery, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successCreated(res, result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -435,14 +454,14 @@ export const reportContents = async (req: Request, res: Response) => {
 export const takeAction = async (req: Request, res: Response) => {
   const reqBody = req.body;
   try {
-    takeActionOnContentLists(reqBody,(error:any, result:any) => {
-      if(error){
+    takeActionOnContentLists(reqBody, (error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successCreated(res, result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -450,14 +469,14 @@ export const takeAction = async (req: Request, res: Response) => {
 
 export const dashboardData = async (req: Request, res: Response) => {
   try {
-    dashboardDataCount((error:any, result:any) => {
-      if(error){
+    dashboardDataCount((error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successResponse(res, "Dashboard data.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -465,14 +484,14 @@ export const dashboardData = async (req: Request, res: Response) => {
 
 export const notification = async (req: Request, res: Response) => {
   try {
-    notificationDataForAdmin((error:any, result:any) => {
-      if(error){
+    notificationDataForAdmin((error: any, result: any) => {
+      if (error) {
         return ErrorResponse(res, error)
       }
       return successResponse(res, "Notification data.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
     }
   }
@@ -481,16 +500,16 @@ export const notification = async (req: Request, res: Response) => {
 
 export const adsConfig = async (req: Request, res: Response) => {
   try {
-    const {device_type = "android"} = req.query; // ios | android 
-    adsConfigLogic(String(device_type),(error:any, result:any) => {
-        if(error){
-            return ErrorResponse(res, error)
-        }
-        return successResponse(res, "Ads Config.", result)
+    const { device_type = "android" } = req.query; // ios | android 
+    adsConfigLogic(String(device_type), (error: any, result: any) => {
+      if (error) {
+        return ErrorResponse(res, error)
+      }
+      return successResponse(res, "Ads Config.", result)
     })
   } catch (error) {
-    if(error instanceof Error){
+    if (error instanceof Error) {
       return ErrorResponse(res, error.message)
-    }  
+    }
   }
 }
