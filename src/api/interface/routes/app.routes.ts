@@ -137,17 +137,17 @@ export const AdminRoute = (router: express.Router): void => {
   route.get("/admin/notification", verifyToken, adminProtector, notification);
 
   // Admin Blog Management
-  route.post("/admin/blogs", verifyToken, adminProtector, upload.array("files", 1), createBlogHandler);
-  route.put("/admin/blogs/:id", verifyToken, adminProtector, upload.array("files", 1), updateBlogHandler);
+  route.post("/admin/blogs", verifyToken, adminProtector, upload.array("image", 1), createBlogHandler);
+  route.put("/admin/blogs/:id", verifyToken, adminProtector, upload.array("image", 1), updateBlogHandler);
   route.delete("/admin/blogs/:id", verifyToken, adminProtector, deleteBlogHandler);
-  route.get("/admin/blogs", verifyToken, adminProtector, listBlogsAdminHandler);
+  route.get("/admin/blogs", listBlogsAdminHandler);
   route.get("/admin/blogs/:id", verifyToken, adminProtector, getBlogDetailHandler);
 
   // Admin App Content Management
   route.post("/admin/app-content", verifyToken, adminProtector, createAppContentHandler);
   route.put("/admin/app-content/:id", verifyToken, adminProtector, updateAppContentHandler);
   route.delete("/admin/app-content/:id", verifyToken, adminProtector, deleteAppContentHandler);
-  route.get("/admin/app-content", verifyToken, adminProtector, listAppContentsHandler);
+  route.get("/admin/app-content", listAppContentsHandler);
   route.get("/admin/app-content/:id", verifyToken, adminProtector, getAppContentDetailHandler);
 
   route.get("/ads-config", adsConfig);
